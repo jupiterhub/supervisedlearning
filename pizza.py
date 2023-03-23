@@ -6,12 +6,13 @@ import seaborn as sea
 
 def plot(x, y):
     sea.set()
-    plt.axis([0, 50, 0, 50])                                 # scale axes (0 to 50)
-    plt.xticks(fontsize=14)                                  # set x axis ticks
-    plt.yticks(fontsize=14)                                  # set y axis ticks
-    plt.xlabel("Reservations", fontsize=14)                  # set x axis label
-    plt.ylabel("Pizzas", fontsize=14)                        # set y axis label
-    plt.plot(x, y, "bo")                                     # plot data
+    plt.plot(x, y, "bo")
+    plt.xlabel("Reservations")
+    plt.ylabel("Pizzas")
+    x_edge, y_edge = 50,50
+    plt.axis([0, x_edge, 0, y_edge])
+    # Plot line
+    plt.plot([0, x_edge], [b, predict(x_edge, w, b)], linewidth=1.0, color="g")
     plt.show()
 
 
@@ -32,7 +33,7 @@ def train(x, y, iterations, lr):
     b = 0
     for i in range(iterations):
         current_loss = loss(x, y, w, b)
-        print("Iteration w=%f %4d => Loss: %.6f" % (w, i, current_loss))
+        # print("Iteration w=%f %4d => Loss: %.6f" % (w, i, current_loss))
 
         if loss(x, y, w + lr, b) < current_loss:
             w += lr
@@ -51,11 +52,9 @@ def train(x, y, iterations, lr):
 X, Y = np.loadtxt("pizza.txt", skiprows=1, unpack=True)  # load data
 
 # Train the system
-w, b = train(X, Y, iterations=10000, lr=0.01)
+w, b = train(X, Y, iterations=1000000, lr=0.01)
 print("\nw=%.3f, b=%.3f" % (w, b))
-
-# Predict the number of pizzas
 print("Prediction: x=%d => y=%.2f" % (20, predict(20, w, b)))
 
-# plot it
-# plot(X, Y)
+# Plot it
+plot(X, Y)
