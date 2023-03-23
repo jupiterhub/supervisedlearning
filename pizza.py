@@ -15,32 +15,35 @@ def plot(x, y):
     plt.show()
 
 
-def predict(x, w):
-    prediction = x * w
-    print("\t Prediction", prediction)
+def predict(x, w, b):
+    prediction = x * w + b
+    # print("\t Prediction", prediction)
     return prediction
 
 
-def loss(x, y, w):
-    loss_before_avg = (predict(x, w) - y) ** 2
-    print("\t loss before avg", loss_before_avg)
-    loss_avg = np.average(loss_before_avg)
-    print("\t loss after avg", loss_avg)
-    return loss_avg
+def loss(x, y, w, b):
+    loss_before_avg = (predict(x, w, b) - y) ** 2
+    # print("\t loss before avg", loss_before_avg)
+    return np.average(loss_before_avg)
 
 
 def train(x, y, iterations, lr):
     w = 0
+    b = 0
     for i in range(iterations):
-        current_loss = loss(x, y, w)
+        current_loss = loss(x, y, w, b)
         print("Iteration w=%f %4d => Loss: %.6f" % (w, i, current_loss))
 
-        if loss(x, y, w + lr) < current_loss:
+        if loss(x, y, w + lr, b) < current_loss:
             w += lr
-        elif loss(x, y, w - lr) < current_loss:
+        elif loss(x, y, w - lr, b) < current_loss:
             w -= lr
+        elif loss(x, y, w, b + lr) < current_loss:
+            b += lr
+        elif loss(x, y, w, b - lr) < current_loss:
+            b -= lr
         else:
-            return w
+            return w, b
     raise Exception("Couldn't converge within %d iterations" % iterations)
 
 
@@ -48,10 +51,11 @@ def train(x, y, iterations, lr):
 X, Y = np.loadtxt("pizza.txt", skiprows=1, unpack=True)  # load data
 
 # Train the system
-w = train(X, Y, iterations=10000, lr=0.01)
-print("\nw=%.3f" % w)
+w, b = train(X, Y, iterations=10000, lr=0.01)
+print("\nw=%.3f, b=%.3f" % (w, b))
 
 # Predict the number of pizzas
-print("Prediction: x=%d => y=%.2f" % (20, predict(20, w)))
+print("Prediction: x=%d => y=%.2f" % (20, predict(20, w, b)))
 
-plot(X, Y)
+# plot it
+# plot(X, Y)
