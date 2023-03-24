@@ -9,51 +9,64 @@ def plot(x, y):
     plt.plot(x, y, "bo")
     plt.xlabel("Reservations")
     plt.ylabel("Pizzas")
-    x_edge, y_edge = 50,50
+    x_edge, y_edge = 50, 50
     plt.axis([0, x_edge, 0, y_edge])
     # Plot line
-    plt.plot([0, x_edge], [b, predict(x_edge, w, b)], linewidth=1.0, color="g")
+    plt.plot([0, x_edge], [b, predict(y_edge, w, b)], linewidth=1.0, color="g")
     plt.show()
 
 
-def predict(x, w, b):
-    prediction = x * w + b
+def predict(x, weight, bias):
+    prediction = x * weight + bias
     # print("\t Prediction", prediction)
     return prediction
 
 
-def loss(x, y, w, b):
-    loss_before_avg = (predict(x, w, b) - y) ** 2
+def loss(x, y, weight, bias):
+    loss_before_avg = (predict(x, weight, bias) - y) ** 2
     # print("\t loss before avg", loss_before_avg)
     return np.average(loss_before_avg)
 
 
-def train(x, y, iterations, lr):
-    w = 0
-    b = 0
-    for i in range(iterations):
-        current_loss = loss(x, y, w, b)
-        # print("Iteration w=%f %4d => Loss: %.6f" % (w, i, current_loss))
+def gradient(x, y, weight):
+    return 2 * np.average(x * (predict(x, weight, 0) - y))  # fix bias for now
 
-        if loss(x, y, w + lr, b) < current_loss:
-            w += lr
-        elif loss(x, y, w - lr, b) < current_loss:
-            w -= lr
-        elif loss(x, y, w, b + lr) < current_loss:
-            b += lr
-        elif loss(x, y, w, b - lr) < current_loss:
-            b -= lr
+
+def train_linear(x, y, iterations, lr):
+    weight, bias = 0, 0
+    for i in range(iterations):
+        current_loss = loss(x, y, weight, bias)
+        # print("Iteration weight=%f %4d => Loss: %.6f" % (weight, i, current_loss))
+
+        if loss(x, y, weight + lr, bias) < current_loss:
+            weight += lr
+        elif loss(x, y, weight - lr, bias) < current_loss:
+            weight -= lr
+        elif loss(x, y, weight, bias + lr) < current_loss:
+            bias += lr
+        elif loss(x, y, weight, bias - lr) < current_loss:
+            bias -= lr
         else:
-            return w, b
+            return weight, bias
     raise Exception("Couldn't converge within %d iterations" % iterations)
+
+
+def train(x, y, iterations, lr):
+    weight = 0
+    for i in range(iterations):
+        print("Iteration %4d => Loss: %.10f" % (i, loss(X, Y, weight, 0)))
+        weight -= gradient(X, Y, weight) * lr
+    return weight
 
 
 # Import the dataset
 X, Y = np.loadtxt("pizza.txt", skiprows=1, unpack=True)  # load data
 
 # Train the system
-w, b = train(X, Y, iterations=1000000, lr=0.01)
-print("\nw=%.3f, b=%.3f" % (w, b))
+w = train(X, Y, iterations=100, lr=0.001)
+print("\nw=%.10f" % w)
+
+# Predict needed pizzas
 print("Prediction: x=%d => y=%.2f" % (20, predict(20, w, b)))
 
 # Plot it
