@@ -18,7 +18,7 @@ def train(x, y, iterations, lr):
     w = np.zeros((x.shape[1], 1))  # match number of rows with zeros, 1 column
     for i in range(iterations):
         print("Iteration %4d => Loss: %.20f" % (i, (loss(x, y, w))))
-        print("W" % (i, (loss(x, y, w))))
+        print("\tWeight: ", w.T)
         w -= gradient(x, y, w) * lr
     return w
 
