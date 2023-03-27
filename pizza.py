@@ -28,8 +28,11 @@ def loss(x, y, weight, bias):
     return np.average(loss_before_avg)
 
 
-def gradient(x, y, weight):
-    return 2 * np.average(x * (predict(x, weight, 0) - y))  # fix bias for now
+def gradient(x, y, weight, bias):
+    weight_gradient = 2 * np.average(x * (predict(x, weight, bias) - y))
+    bias_gradient = 2 * np.average(predict(x, weight, bias) - y)
+
+    return weight_gradient, bias_gradient
 
 
 def train_linear(x, y, iterations, lr):
@@ -52,19 +55,22 @@ def train_linear(x, y, iterations, lr):
 
 
 def train(x, y, iterations, lr):
-    weight = 0
+    weight = bias = 0
     for i in range(iterations):
-        print("Iteration %4d => Loss: %.10f" % (i, loss(X, Y, weight, 0)))
-        weight -= gradient(X, Y, weight) * lr
-    return weight
+        if i % 5000 == 0:
+            print("Iteration %4d => Loss: %.10f" % (i, loss(x, y, weight, bias)))
+        w_gradient, b_gradient = gradient(x, y, weight, bias)
+        weight -= w_gradient * lr
+        bias -= b_gradient * lr
+    return weight, bias
 
 
 # Import the dataset
 X, Y = np.loadtxt("pizza.txt", skiprows=1, unpack=True)  # load data
 
 # Train the system
-w = train(X, Y, iterations=100, lr=0.001)
-print("\nw=%.10f" % w)
+w,b = train(X, Y, iterations=20000, lr=0.005)
+print("\nw=%.10f, b=%.10f" % (w, b))
 
 # Predict needed pizzas
 print("Prediction: x=%d => y=%.2f" % (20, predict(20, w, b)))
