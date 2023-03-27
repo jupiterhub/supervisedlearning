@@ -33,25 +33,6 @@ def gradient(x, y, weight):
     return 2 * np.matmul(x.T, (predict(x, weight) - y)) / x.shape[0]
 
 
-def train_linear(x, y, iterations, lr):
-    weight, bias = 0, 0
-    for i in range(iterations):
-        current_loss = loss(x, y, weight, bias)
-        # print("Iteration weight=%f %4d => Loss: %.6f" % (weight, i, current_loss))
-
-        if loss(x, y, weight + lr, bias) < current_loss:
-            weight += lr
-        elif loss(x, y, weight - lr, bias) < current_loss:
-            weight -= lr
-        elif loss(x, y, weight, bias + lr) < current_loss:
-            bias += lr
-        elif loss(x, y, weight, bias - lr) < current_loss:
-            bias -= lr
-        else:
-            return weight, bias
-    raise Exception("Couldn't converge within %d iterations" % iterations)
-
-
 def train(x, y, iterations, lr):
     weight = np.zeros((x.shape[1], 1))  # no of inputs x 1 column matrix
     for i in range(iterations):
@@ -77,6 +58,7 @@ print("\nweight=", w)
 # Therefore, Pizza's are impacted most by tourist and least by temp changes
 
 print("\nWeights: %s" % w.T)
+# prediction are accurate and not off by more than 2 pizzas
 print("\nA few predictions:")
 for i in range(5):
     # predict the needed pizzas
