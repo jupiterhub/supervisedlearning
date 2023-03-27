@@ -16,21 +16,21 @@ def plot(x, y):
     plt.show()
 
 
-def predict(x, weight, bias):
+def predict(x, weight):
     prediction = np.matmul(x, weight)
     # print("\t Prediction", prediction)
     return prediction
 
 
-def loss(x, y, weight, bias):
-    loss_before_avg = (predict(x, weight, bias) - y) ** 2
+def loss(x, y, weight, ):
+    loss_before_avg = (predict(x, weight) - y) ** 2
     # print("\t loss before avg", loss_before_avg)
     return np.average(loss_before_avg)
 
 
-def gradient(x, y, weight, bias):
+def gradient(x, y, weight):
     # X.T means transposed (covert rows -> columns)
-    return 2 * np.matmul(x.T, (predict(x, weight, bias) - y)) / x.shape[0]
+    return 2 * np.matmul(x.T, (predict(x, weight) - y)) / x.shape[0]
 
 
 def train_linear(x, y, iterations, lr):
@@ -53,18 +53,19 @@ def train_linear(x, y, iterations, lr):
 
 
 def train(x, y, iterations, lr):
-    bias = 0
-    weight = np.zeros((x.shape[1], 1))   # no of inputs x 1 column matrix
+    weight = np.zeros((x.shape[1], 1))  # no of inputs x 1 column matrix
     for i in range(iterations):
-        print("Iteration %4d => Loss: %.10f" % (i, loss(x, y, weight, bias)))
-        weight -= gradient(x, y, weight, bias) * lr
+        print("Iteration %4d => Loss: %.10f" % (i, loss(x, y, weight)))
+        weight -= gradient(x, y, weight) * lr
     return weight
 
 
 # Import the dataset
 x1, x2, x3, y = np.loadtxt("pizza_3_vars.txt", skiprows=1, unpack=True)  # load data
 
-X = np.column_stack((x1,x2,x3))  # stack all input variables into 1 X
+# insert 1s at the start as a 'bias'
+X = np.column_stack((np.ones(x1.size), x1, x2, x3))
+
 # X.shape  # => (30, 3)
 Y = y.reshape(-1, 1)  # fit the column with as many rows
 # Y.shape  # => (30, 1)
@@ -72,9 +73,11 @@ Y = y.reshape(-1, 1)  # fit the column with as many rows
 # Train the system
 w = train(X, Y, iterations=50000, lr=0.001)
 print("\nweight=", w)
+# first weight = bias, 2nd reservation, temp, tourist. Tourist has a large weight, temp has tiny one
+# Therefore, Pizza's are impacted most by tourist and least by temp changes
 
-# Predict needed pizzas
-# print("Prediction: x=%d => y=%.2f" % (20, predict(20, w, b)))
-
-# Plot it
-# plot(X, Y)
+print("\nWeights: %s" % w.T)
+print("\nA few predictions:")
+for i in range(5):
+    # predict the needed pizzas
+    print("X[%d] -> %.4f (label: %d)" % (i, predict(X[i], w), Y[i]))
