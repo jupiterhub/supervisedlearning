@@ -17,7 +17,7 @@ def plot(x, y):
 
 
 def predict(x, weight, bias):
-    prediction = x * weight + bias
+    prediction = np.matmul(x, weight)
     # print("\t Prediction", prediction)
     return prediction
 
@@ -29,10 +29,8 @@ def loss(x, y, weight, bias):
 
 
 def gradient(x, y, weight, bias):
-    weight_gradient = 2 * np.average(x * (predict(x, weight, bias) - y))
-    bias_gradient = 2 * np.average(predict(x, weight, bias) - y)
-
-    return weight_gradient, bias_gradient
+    # X.T means transposed (covert rows -> columns)
+    return 2 * np.matmul(x.T, (predict(x, weight, bias) - y)) / x.shape[0]
 
 
 def train_linear(x, y, iterations, lr):
@@ -55,25 +53,28 @@ def train_linear(x, y, iterations, lr):
 
 
 def train(x, y, iterations, lr):
-    weight = bias = 0
+    bias = 0
+    weight = np.zeros((x.shape[1], 1))   # no of inputs x 1 column matrix
     for i in range(iterations):
-        if i % 5000 == 0:
-            print("Iteration %4d => Loss: %.10f" % (i, loss(x, y, weight, bias)))
-        w_gradient, b_gradient = gradient(x, y, weight, bias)
-        weight -= w_gradient * lr
-        bias -= b_gradient * lr
-    return weight, bias
+        print("Iteration %4d => Loss: %.10f" % (i, loss(x, y, weight, bias)))
+        weight -= gradient(x, y, weight, bias) * lr
+    return weight
 
 
 # Import the dataset
-X, Y = np.loadtxt("pizza.txt", skiprows=1, unpack=True)  # load data
+x1, x2, x3, y = np.loadtxt("pizza_3_vars.txt", skiprows=1, unpack=True)  # load data
+
+X = np.column_stack((x1,x2,x3))  # stack all input variables into 1 X
+# X.shape  # => (30, 3)
+Y = y.reshape(-1, 1)  # fit the column with as many rows
+# Y.shape  # => (30, 1)
 
 # Train the system
-w,b = train(X, Y, iterations=20000, lr=0.005)
-print("\nw=%.10f, b=%.10f" % (w, b))
+w = train(X, Y, iterations=50000, lr=0.001)
+print("\nweight=", w)
 
 # Predict needed pizzas
-print("Prediction: x=%d => y=%.2f" % (20, predict(20, w, b)))
+# print("Prediction: x=%d => y=%.2f" % (20, predict(20, w, b)))
 
 # Plot it
-plot(X, Y)
+# plot(X, Y)
