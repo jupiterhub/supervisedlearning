@@ -2,8 +2,14 @@ import numpy as np
 
 
 # computing predictions
+# deprecated, to be replaced by forward - for forward propagation
 def predict(x, w):
     return np.matmul(x, w)
+
+
+def forward(x, w):
+    weighted_sum = np.matmul(x, w)
+    return sigmoid(weighted_sum)
 
 
 def loss(x, y, w):
