@@ -14,6 +14,10 @@ def gradient(x, y, w):
     return 2 * np.matmul(x.T, (predict(x, w) - y)) / x.shape[0]
 
 
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
+
+
 def train(x, y, iterations, lr):
     w = np.zeros((x.shape[1], 1))  # match number of rows with zeros, 1 column
     for i in range(iterations):
@@ -26,7 +30,8 @@ def train(x, y, iterations, lr):
 # load data  - X (Pollution, Healthcare, Water) Y Life
 x1, x2, x3, y_truth = np.loadtxt("life-expectancy.txt", skiprows=1, unpack=True)
 X = np.column_stack((np.ones(x1.size), x1, x2, x3))  # np.ones(x1.size) is to add bias of 1s
-Y = y_truth.reshape(-1, 1)  # make it into a matrix, since multiplying matrix 1d-array to matrix produce unpredictable results
+Y = y_truth.reshape(-1,
+                    1)  # make it into a matrix, since multiplying matrix 1d-array to matrix produce unpredictable results
 weight = train(X, Y, iterations=1000, lr=0.0001)
 
 # Bias, Pollution, Healthcare, Water - Water has the most impact then healthcare
