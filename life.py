@@ -2,29 +2,10 @@ import numpy as np
 
 
 # computing predictions
-# deprecated, to be replaced by forward - for forward propagation
 def predict(x, w):
     return np.matmul(x, w)
 
 
-def forward(x, w):
-    weighted_sum = np.matmul(x, w)
-    return sigmoid(weighted_sum)
-
-
-# labels used are 0/1 so let's round to get unambiguous answers
-def classify(x, w):
-    return np.round(forward(x, w))
-
-
-def log_loss(x, y, w):
-    y_hat = forward(x, w)
-    first_term = y * np.log(y_hat)
-    second_term = (1 - y) * np.log(1 - y_hat)
-    return -np.average(first_term + second_term)
-
-
-# deprecated, use log_loss because loss produces valleys with sigmoid
 def loss(x, y, w):
     return np.average((predict(x, w) - y) ** 2)
 
