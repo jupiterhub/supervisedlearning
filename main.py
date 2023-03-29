@@ -12,6 +12,11 @@ def forward(x, w):
     return sigmoid(weighted_sum)
 
 
+# labels used are 0/1 so let's round to get unambiguous answers
+def classify(x, w):
+    return np.round(forward(x, w))
+
+
 def loss(x, y, w):
     return np.average((predict(x, w) - y) ** 2)
 
