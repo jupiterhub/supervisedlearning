@@ -40,13 +40,24 @@ def load_labels(filename):
         return np.frombuffer(all_labels, dtype=np.uint8).reshape(-1, 1)
 
 
-def encode_fives(Y):
+# Deprecated, use one_hot_encode to recognize all digits
+def encode_fives(y):
     # Convert all 5s to 1, and everything else to 0
-    return (Y == 5).astype(int)
+    return (y == 5).astype(int)
+
+
+def one_hot_encode(y):
+    n_labels = y.shape[0]
+    n_classes = 10
+    encoded_y = np.zeros((n_labels, n_classes))
+    for i in range(n_labels):
+        label = y[i]
+        encoded_y[i][label] = 1
+    return encoded_y
 
 
 # 60K labels, each with value 1 if the digit is a five, and 0 otherwise
-Y_train = encode_fives(load_labels("mnist_data/train-labels-idx1-ubyte.gz"))
+Y_train = one_hot_encode(load_labels("mnist_data/train-labels-idx1-ubyte.gz"))
 
 # 10000 labels, with the same encoding as Y_train
-Y_test = encode_fives(load_labels("mnist_data/t10k-labels-idx1-ubyte.gz"))
+Y_test = load_labels("mnist_data/t10k-labels-idx1-ubyte.gz")

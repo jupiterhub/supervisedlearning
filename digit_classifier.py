@@ -1,6 +1,6 @@
 # A binary classifier that recognizes one of the digits in MNIST.
-
 import numpy as np
+import mnist as data
 
 
 # Applying Logistic Regression
@@ -17,7 +17,9 @@ def forward(x, w):
 
 # Calling the predict() function
 def classify(x, w):
-    return np.round(forward(x, w))
+    y_hat = forward(x, w)
+    labels = np.argmax(y_hat, axis=1)
+    return labels.reshape(-1, 1)
 
 
 # Computing Loss over using logistic regression
@@ -33,12 +35,23 @@ def gradient(x, y, w):
     return np.matmul(x.T, (forward(x, w) - y)) / x.shape[0]
 
 
+# Printing results to the terminal screen
+def report(iteration, x_train, y_train, x_test, y_test, w):
+    matches = np.count_nonzero(classify(x_test, w) == y_test)
+    n_test_examples = y_test.shape[0]
+    matches = matches * 100.0 / n_test_examples
+    training_loss = loss(x_train, y_train, w)
+    if (iteration % 20 == 0) or iteration == 199:
+        print("%d - Loss: %.20f, %.2f%%" % (iteration, training_loss, matches))
+
+
 # calling the training function for desired no. of iterations
-def train(x, y, iterations, lr):
-    w = np.zeros((x.shape[1], 1))
+def train(x_train, y_train, x_test, y_test, iterations, lr):
+    w = np.zeros((x_train.shape[1], y_train.shape[1]))
     for i in range(iterations):
-        print('Iteration %4d => Loss: %.20f' % (i, loss(x, y, w)))
-        w -= gradient(x, y, w) * lr
+        report(i, x_train, y_train, x_test, y_test, w)
+        w -= gradient(x_train, y_train, w) * lr
+    report(iterations, x_train, y_train, x_test, y_test, w)
     return w
 
 
@@ -52,8 +65,6 @@ def test(x, y, w):
 
 
 # Test it
-import mnist as data
-
-w = train(data.X_train, data.Y_train, iterations=100, lr=1e-5)
-# use a different data for test to avoid overfitting
-test(data.X_test, data.Y_test, w)
+w = train(data.X_train, data.Y_train,
+          data.X_test, data.Y_test,
+          iterations=200, lr=1e-5)
