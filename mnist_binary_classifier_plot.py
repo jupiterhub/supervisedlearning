@@ -1,3 +1,4 @@
+# Plots only the selected digit
 import mnist
 import numpy as np
 import matplotlib.pyplot as plt
