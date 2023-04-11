@@ -1,4 +1,5 @@
 import numpy as np
+import mnist
 
 
 def sigmoid(z):
@@ -73,8 +74,16 @@ def train(x_train, y_train, x_test, y_test, n_hidden_nodes, iterations, lr):
     return w1, w2
 
 
-# example of saturated sigmoid by providing  a large number
-# gradeint of 0 is multiplied with other local gradients, causing entire gradient to beecome 0
-# it doesn't matter how long we train, because this is now a "dead neuron"
-weighted_sum = 1000 * 10
-print(sigmoid(weighted_sum))
+def initialize_weights(n_input_variables, n_hidden_nodes, n_classes):
+    w1_rows = n_input_variables + 1
+    w1 = np.random.randn(w1_rows, n_hidden_nodes) * np.sqrt(1 / w1_rows)
+
+    w2_rows = n_hidden_nodes + 1
+    w2 = np.random.randn(w2_rows, n_classes) * np.sqrt(1 / w2_rows)
+
+    return w1, w2
+
+
+w1, w2 = train(mnist.X_train, mnist.Y_train,
+               mnist.X_test, mnist.Y_test,
+               n_hidden_nodes=200, iterations=20, lr=0.01)
