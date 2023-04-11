@@ -20,3 +20,10 @@ def prepend_bias(X):
 
 def sigmoid_gradient(sigmoid):
     return np.multiply(sigmoid, (1 - sigmoid))
+
+
+def back(x, y, y_hat, w2, h):
+    w2_gradient = np.matmul(prepend_bias(h).T, (y_hat - y)) / x.shape[0]
+    w1_gradient = np.matmul(prepend_bias(x).T, np.matmul(y_hat - y, w2[1:].T)
+                            * sigmoid_gradient(h)) / x.shape[0]
+    return w1_gradient, w2_gradient
