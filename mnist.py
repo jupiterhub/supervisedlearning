@@ -49,16 +49,25 @@ def one_hot_encode(y):
     return encoded_y
 
 
+def standardize(training_set, test_set):
+    average = np.average(training_set)
+    standard_deviation = np.std(training_set)
+    training_set_standardized = (training_set - average) / standard_deviation
+    test_set_standardized = (test_set - average) / standard_deviation
+    return training_set_standardized, test_set_standardized
+
+
 # X_train/X_validation/X_test: 60K/5K/5K images
 # Each image has 784 elements (28 * 28 pixels)
-X_train = load_images("/mnist_data/train-images-idx3-ubyte.gz")
-X_test_all = load_images("/mnist_data/t10k-images-idx3-ubyte.gz")
+X_train_raw = load_images("mnist_data/train-images-idx3-ubyte.gz")
+X_test_raw = load_images("mnist_data/t10k-images-idx3-ubyte.gz")
+X_train, X_test_all = standardize(X_train_raw, X_test_raw)
 X_validation, X_test = np.split(X_test_all, 2)
 
 # 60K labels, each a single digit from 0 to 9
-Y_train_unencoded = load_labels("/mnist_data/train-labels-idx1-ubyte.gz")
+Y_train_unencoded = load_labels("mnist_data/train-labels-idx1-ubyte.gz")
 # Y_train: 60K labels, each consisting of 10 one-hot-encoded elements
 Y_train = one_hot_encode(Y_train_unencoded)
 # Y_validation/Y_test: 5K/5K labels, each a single digit from 0 to 9
-Y_test_all = load_labels("/mnist_data/t10k-labels-idx1-ubyte.gz")
+Y_test_all = load_labels("mnist_data/t10k-labels-idx1-ubyte.gz")
 Y_validation, Y_test = np.split(Y_test_all, 2)
